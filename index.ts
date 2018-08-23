@@ -1,20 +1,20 @@
 import { Subject, Observable, Observer } from 'rxjs';
 import { request, IncomingMessage, ClientRequest } from 'http';
-import { parse } from 'url';
+import { parse, URLSearchParams } from 'url';
 import { createGunzip } from 'zlib';
 import { createWriteStream } from 'fs';
 export interface Iwe7WgetOptions {
-    gunzip?: boolean;
+    [key: string]: string;
 }
 export class Iwe7Wget extends Subject<any> {
     constructor() {
         super();
     }
     download(src: string, output: string, options?: Iwe7WgetOptions) {
-        options = options || {
-            gunzip: true
-        }
         const newUrl = parse(src);
+        const searchParams = new URLSearchParams(options);
+        newUrl.search = searchParams.toString();
+        console.log(newUrl);
         return Observable.create((obser: Observer<any>) => {
             const clientRequest: ClientRequest = request(newUrl, (res: IncomingMessage) => {
                 if (res.statusCode === 200) {
@@ -33,7 +33,7 @@ export class Iwe7Wget extends Subject<any> {
                         encoding = res.headers['content-encoding'];
                     }
                     // 压缩gzip
-                    if (options.gunzip === true && encoding === 'gzip') {
+                    if (encoding === 'gzip') {
                         res.pipe(gunzip);
                     } else {
                         res.pipe(writeStream);

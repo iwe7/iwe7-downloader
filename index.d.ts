@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 export interface Iwe7WgetOptions {
-    gunzip?: boolean;
+    [key: string]: string;
 }
 export declare class Iwe7Wget extends Subject<any> {
     constructor();
